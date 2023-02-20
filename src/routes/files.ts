@@ -18,9 +18,9 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 		async (request) => {
 			const { sessionId } = request.cookies;
 
-			const users = await knex('users').where('session_id', sessionId).select();
+			const files = await knex('files').where('session_id', sessionId).select();
 
-			return { users };
+			return { files };
 		},
 	);
 
@@ -30,22 +30,22 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 			preHandler: [checkSessionIdExists],
 		},
 		async (request) => {
-			const getUsersParamsSchema = z.object({
+			const getFilesParamsSchema = z.object({
 				id: z.string().uuid(),
 			});
 
-			const { id } = getUsersParamsSchema.parse(request.params);
+			const { id } = getFilesParamsSchema.parse(request.params);
 
 			const { sessionId } = request.cookies;
 
-			const user = await knex('users')
+			const files = await knex('files')
 				.where({
 					id,
 					session_id: sessionId,
 				})
 				.first();
 
-			return { user };
+			return { files };
 		},
 	);
 
