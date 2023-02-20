@@ -86,8 +86,6 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 			});
 		}
 
-		// const { name, doctor, employment, exams } = request.body;
-
 		const [file] = await knex('files').insert(
 			{
 				id: randomUUID(),
@@ -98,18 +96,14 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 		);
 
 		await knex('doctors').insert({
+			...doctor,
 			id: randomUUID(),
-			cpf: doctor.cpf,
-			crm: doctor.crm,
-			name: doctor.name,
-			uf: doctor.uf,
 			file_id: file.id,
 		});
 
 		await knex('employments').insert({
+			...employment,
 			id: randomUUID(),
-			cpf: employment.cpf,
-			enrollment: employment.enrollment,
 			file_id: file.id,
 		});
 
