@@ -69,20 +69,30 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 
 		const { name, doctor, employment, exams } = request.body;
 
-		console.log(name, doctor, employment, exams);
-
 		const [file] = await knex('files').insert(
 			{
-				id: randomUUID(),
+				// id: randomUUID(),
 				name,
 				session_id: sessionId,
 			},
 			['id'],
 		);
 
-		console.log(file);
+		console.log('file: ', {
+			// id: randomUUID(),
+			name,
+			session_id: sessionId,
+		});
 
 		await knex('doctors').insert({
+			cpf: doctor.cpf,
+			crm: doctor.crm,
+			name: doctor.name,
+			uf: doctor.uf,
+			file_id: file.id,
+		});
+
+		console.log('doctor: ', {
 			cpf: doctor.cpf,
 			crm: doctor.crm,
 			name: doctor.name,
@@ -96,16 +106,29 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 			file_id: file.id,
 		});
 
+		console.log('employment: ', {
+			cpf: employment.cpf,
+			enrollment: employment.enrollment,
+			file_id: file.id,
+		});
+
 		await Promise.all(
-			exams.map(
-				async (exam) =>
-					await knex('exams').insert({
-						date: new Date(exam.date),
-						description: exam.description,
-						proceeding: exam.proceeding,
-						file_id: file.id,
-					}),
-			),
+			exams.map(async (exam) => {
+				console.log('exam: ', {
+					date: new Date(exam.date),
+					description: exam.description,
+					proceeding: exam.proceeding,
+					file_id: file.id,
+				});
+
+				return await knex('exams').insert({
+					id: randomUUID(),
+					date: new Date(exam.date),
+					description: exam.description,
+					proceeding: exam.proceeding,
+					file_id: file.id,
+				});
+			}),
 		);
 
 		return reply.status(201).send();

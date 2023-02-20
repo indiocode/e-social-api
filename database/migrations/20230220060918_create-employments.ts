@@ -1,8 +1,9 @@
+import { randomUUID } from 'crypto';
 import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
 	await knex.schema.createTable('employments', (table) => {
-		table.uuid('id').primary();
+		table.uuid('id').primary().defaultTo(randomUUID());
 		table.string('cpf').notNullable();
 		table.string('enrollment').notNullable();
 		table
