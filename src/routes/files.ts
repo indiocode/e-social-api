@@ -50,11 +50,30 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 	);
 
 	app.post('/', async (request, reply) => {
-		// const createUserBodySchema = z.object({
-		// 	name: z.string(),
-		// });
+		const createUserBodySchema = z.object({
+			name: z.string(),
+			doctor: z.object({
+				cpf: z.string(),
+				crm: z.number(),
+				name: z.string(),
+				uf: z.string(),
+			}),
+			employment: z.object({
+				cpf: z.string(),
+				enrollment: z.string(),
+			}),
+			exams: z.array(
+				z.object({
+					date: z.string(), //date in database
+					description: z.string(),
+					proceeding: z.number(),
+				}),
+			),
+		});
 
-		// const { name } = createUserBodySchema.parse(request.body);
+		const { name, doctor, employment, exams } = createUserBodySchema.parse(
+			request.body,
+		);
 
 		let { sessionId } = request.cookies;
 
@@ -67,7 +86,7 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 			});
 		}
 
-		const { name, doctor, employment, exams } = request.body;
+		// const { name, doctor, employment, exams } = request.body;
 
 		const [file] = await knex('files').insert(
 			{
@@ -98,6 +117,7 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 			exams.map((exam) => {
 				return {
 					...exam,
+					date: new Date(exam.date),
 					id: randomUUID(),
 					file_id: file.id,
 				};
