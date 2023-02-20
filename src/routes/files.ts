@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { knex } from '~/database';
 import { checkSessionIdExists } from '~/middlewares/check-session-id-exists';
 
-export async function usersRoutes(app: FastifyInstance): Promise<void> {
+export async function filesRoutes(app: FastifyInstance): Promise<void> {
 	// app.addHook('preHandler', async (request, reply) => {
 	// 	console.log(`[${request.method}] ${request.url}`);
 	// });
@@ -50,12 +50,11 @@ export async function usersRoutes(app: FastifyInstance): Promise<void> {
 	);
 
 	app.post('/', async (request, reply) => {
-		const createUserBodySchema = z.object({
-			name: z.string(),
-			email: z.string(),
-		});
+		// const createUserBodySchema = z.object({
+		// 	name: z.string(),
+		// });
 
-		const { name, email } = createUserBodySchema.parse(request.body);
+		// const { name } = createUserBodySchema.parse(request.body);
 
 		let { sessionId } = request.cookies;
 
@@ -68,12 +67,42 @@ export async function usersRoutes(app: FastifyInstance): Promise<void> {
 			});
 		}
 
-		await knex('users').insert({
-			id: randomUUID(),
-			name,
-			email,
-			session_id: sessionId,
+		const { name, doctor, employment, exams } = request.body;
+
+		const [file] = await knex('files').insert(
+			{
+				id: randomUUID(),
+				name,
+				session_id: sessionId,
+			},
+			['id'],
+		);
+
+		await knex('doctors').insert({
+			cpf: doctor.cpf,
+			crm: doctor.crm,
+			name: doctor.name,
+			uf: doctor.uf,
+			file_id: file.id,
 		});
+
+		await knex('employments').insert({
+			cpf: employment.cpf,
+			enrollment: employment.enrollment,
+			file_id: file.id,
+		});
+
+		await Promise.all(
+			exams.map(
+				async (exam) =>
+					await knex('exams').insert({
+						date: new Date(exam.date),
+						description: exam.description,
+						proceeding: exam.proceeding,
+						file_id: file.id,
+					}),
+			),
+		);
 
 		return reply.status(201).send();
 	});
