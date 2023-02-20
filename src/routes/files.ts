@@ -69,6 +69,8 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 
 		const { name, doctor, employment, exams } = request.body;
 
+		console.log(name, doctor, employment, exams);
+
 		const [file] = await knex('files').insert(
 			{
 				id: randomUUID(),
