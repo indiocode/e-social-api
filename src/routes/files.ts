@@ -78,6 +78,8 @@ export async function filesRoutes(app: FastifyInstance): Promise<void> {
 			['id'],
 		);
 
+		console.log(file);
+
 		await knex('doctors').insert({
 			cpf: doctor.cpf,
 			crm: doctor.crm,
