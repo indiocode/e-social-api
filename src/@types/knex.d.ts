@@ -9,12 +9,14 @@ declare module 'knex/types/tables' {
 			session_id?: string;
 		};
 		exams: {
+			id: string;
 			date: Date;
 			description: string;
 			proceeding: number;
 			file_id: string;
 		};
 		doctors: {
+			id: string;
 			name: string;
 			crm: number;
 			uf: string;
@@ -22,6 +24,7 @@ declare module 'knex/types/tables' {
 			file_id: string;
 		};
 		employments: {
+			id: string;
 			cpf: string;
 			enrollment: string;
 			file_id: string;
