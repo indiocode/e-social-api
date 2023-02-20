@@ -17,3 +17,9 @@ app.register(cookie);
 app.register(filesRoutes, {
 	prefix: 'files',
 });
+
+app.get('/', () => {
+	return {
+		message: 'Velcome to XML Multiples API',
+	};
+});
